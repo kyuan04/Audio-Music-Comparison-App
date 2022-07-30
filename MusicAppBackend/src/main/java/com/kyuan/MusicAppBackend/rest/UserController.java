@@ -1,25 +1,85 @@
 package com.kyuan.MusicAppBackend.rest;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
+import com.kyuan.MusicAppBackend.dao.CustomQuerySpecificationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
-import com.kyuan.MusicAppBackend.dao.UserEntity;
+import com.kyuan.MusicAppBackend.entity.UserEntity;
 import com.kyuan.MusicAppBackend.dao.UserRepository;
 
-@Controller
+@RestController
+@RequestMapping("/v1/login")
 public class UserController {
     @Autowired
     private UserRepository userRepo;
 
-    @GetMapping("/users")
-    public String listAll(Model model) {
+   /* @GetMapping("/users")
+    public List<UserEntity> listAll() {
         List<UserEntity> listUsers = userRepo.findAll();
-        model.addAttribute("listUsers", listUsers);
+        return listUsers;
+    }*/
 
-        return "users";
+    @GetMapping("/users/{id}")
+    public UserEntity getOne(@PathVariable("id") String id) {
+        UserEntity existingEntity = userRepo.getReferenceById(id);
+        return existingEntity;
     }
+
+    @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserEntity createUser(@RequestBody UserEntity entity) {
+        if(entity.getId() == null){
+            entity.setId(generateId());
+        }
+        UserEntity savedEntity = userRepo.save(entity);
+
+        return savedEntity;
+    }
+
+    private String generateId() {
+        Random rand = new Random();
+        int id = rand.nextInt(99999999);
+        return String.format("%08d", id);
+    }
+
+
+    @DeleteMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable("id") String id) {
+        UserEntity existingEntity = userRepo.getReferenceById(id);
+        userRepo.delete(existingEntity);
+    }
+
+    @GetMapping("/users")
+    public List<UserEntity> queryBy(@RequestParam Map<String, String> allParams) {
+        CustomQuerySpecificationBuilder builder = new CustomQuerySpecificationBuilder();
+        for(Map.Entry<String, String> entry: allParams.entrySet()) {
+            builder.with(entry.getKey(), entry.getValue());
+        }
+        Specification<UserEntity> spec = builder.build();
+        List<UserEntity> listUsers = userRepo.findAll(spec);
+        return listUsers;
+    }
+
+    /*private Specification<UserEntity> buildSpecs(@RequestParam Map<String, String> allParams) {
+        if (allParams.size() == 0) {
+            return null;
+        }
+
+        List<SearchCriteria> params = new ArrayList<SearchCriteria>();
+        for (Map.Entry<String, String> entry: allParams.entrySet()) {
+            SearchCriteria sc = new SearchCriteria(entry.getKey(), entry.getValue());
+            params.add(sc);
+            //CustomQuerySpecification spec = new CustomQuerySpecification(sc);
+        }
+        List<Specification> specs = params.stream().map(CustomQuerySpecification::new).collect(Collectors.toList());
+
+    }*/
+
 }
