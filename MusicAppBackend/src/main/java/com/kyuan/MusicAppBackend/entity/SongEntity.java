@@ -28,4 +28,7 @@ public class SongEntity {
     @Column(name = "artist", nullable = false, insertable = true, updatable = true, length = 256)
     private String artist;
 
+    @Column(name = "genre", nullable = false, insertable = true, updatable = true, length = 256)
+    private String genre;
+
 }

@@ -28,14 +28,27 @@ public class SongController {
 
     @PostMapping("/songs")
     @ResponseStatus(HttpStatus.CREATED)
-    public SongEntity uploadSong(@RequestParam("file") MultipartFile multipartFile) throws Exception {
-        SongEntity song = new SongEntity();
-        song.setId(generateId());
-        song.setSongName(multipartFile.getOriginalFilename());
-        song.setSongData(multipartFile.getBytes());
-        song.setSize(String.valueOf(multipartFile.getSize()));
+    public Song uploadSong(@RequestParam("file") MultipartFile multipartFile,
+                                 @RequestParam("artist") String artist,
+                                 @RequestParam("genre") String genre) throws Exception {
+        SongEntity songEntity = new SongEntity();
+        songEntity.setId(generateId());
+        songEntity.setSongName(multipartFile.getOriginalFilename());
+        songEntity.setSongData(multipartFile.getBytes());
+        songEntity.setSize(String.valueOf(multipartFile.getSize()));
+        songEntity.setArtist(artist);
+        songEntity.setGenre(genre);
+        songRepo.save(songEntity);
 
-        return songRepo.save(song);
+        Song song = Song.builder().
+                id(songEntity.getId()).
+                songName(songEntity.getSongName()).
+                size(songEntity.getSize()).
+                artist(songEntity.getArtist()).
+                genre(songEntity.getGenre()).
+                build();
+
+        return song;
     }
     private String generateId() {
         Random rand = new Random();

@@ -13,5 +13,7 @@ public class Song {
     private String id;
     private String songName;
     private String size;
+    private String artist;
+    private String genre;
 
 }
