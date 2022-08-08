@@ -28,4 +28,10 @@ public class UserEntity {
 
     @Column(name = "zip_code", nullable = false, insertable = true, updatable = true, length = 5)
     private String zipCode;
+
+    @Column(name = "password", nullable = false, insertable = true, updatable = true, length = 256)
+    private String password;
+
+    @Column(name = "username", nullable = false, insertable = true, updatable = true, length = 256)
+    private String username;
 }

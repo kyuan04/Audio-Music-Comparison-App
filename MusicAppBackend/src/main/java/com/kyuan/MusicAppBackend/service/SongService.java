@@ -33,10 +33,18 @@ public class SongService {
                         .id(entity.getId())
                         .songName(entity.getSongName())
                         .size(entity.getSize())
+                        .artist(entity.getArtist())
+                        .genre(entity.getGenre())
+                        .url(entity.getUrl())
                         .build();
                 songs.add(song);
             }
         }
         return songs;
+    }
+
+    public byte[] downloadSong(String id) {
+        SongEntity songEntity = this.songRepo.getReferenceById(id);
+        return songEntity.getSongData();
     }
 }
