@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import com.kyuan.MusicAppBackend.entity.UserEntity;
 import com.kyuan.MusicAppBackend.dao.UserRepository;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/v1/login")
+@RequestMapping("/api/v1/login")
 public class UserController {
     @Autowired
     private UserRepository userRepo;
 
-   /* @GetMapping("/users")
+    /*@GetMapping()
     public List<UserEntity> listAll() {
         List<UserEntity> listUsers = userRepo.findAll();
         return listUsers;
@@ -66,20 +67,5 @@ public class UserController {
         List<UserEntity> listUsers = userRepo.findAll(spec);
         return listUsers;
     }
-
-    /*private Specification<UserEntity> buildSpecs(@RequestParam Map<String, String> allParams) {
-        if (allParams.size() == 0) {
-            return null;
-        }
-
-        List<SearchCriteria> params = new ArrayList<SearchCriteria>();
-        for (Map.Entry<String, String> entry: allParams.entrySet()) {
-            SearchCriteria sc = new SearchCriteria(entry.getKey(), entry.getValue());
-            params.add(sc);
-            //CustomQuerySpecification spec = new CustomQuerySpecification(sc);
-        }
-        List<Specification> specs = params.stream().map(CustomQuerySpecification::new).collect(Collectors.toList());
-
-    }*/
 
 }
