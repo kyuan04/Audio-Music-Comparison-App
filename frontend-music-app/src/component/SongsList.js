@@ -4,6 +4,8 @@ import SongDataService from "../service/SongDataService";
 import {Link, useHref} from "react-router-dom";
 import ReactAudioPlayer from 'react-audio-player';
 import ReactPlayer from 'react-player';
+import WaveSurfer from 'wavesurfer.js';
+import Waveform from "./Waveform";
 
 class SongsList extends Component {
     constructor(props) {
@@ -14,13 +16,13 @@ class SongsList extends Component {
         this.setActiveSong = this.setActiveSong.bind(this);
         //this.removeSong = this.removeSong.bind(this);
         this.searchTitle = this.searchTitle.bind(this);
-        this.getSongUrl = this.getSongUrl.bind(this);
+        this.setSongUrl = this.setSongUrl.bind(this);
         //this.downloadSong = this.downloadSong.bind(this);
         //this.saveByteArray = this.saveByteArray.bind(this);
 
         this.state = {
             songs: [],
-            songUrl: "",
+            songUrl: "http://localhost:8080/audios/file_example_MP3_1MG.mp3",
             songName: "",
             currentIndex: -1,
             searchTitle: ""
@@ -100,7 +102,7 @@ class SongsList extends Component {
             });
     }
 
-    getSongUrl(song) {
+    setSongUrl(song) {
         this.setState({
             songUrl: song.url
         }, () => {
@@ -108,6 +110,7 @@ class SongsList extends Component {
         })
         //console.log(song)
         //console.log(this.state.songUrl)
+        //Waveform.setUrl(song.url);
     }
 
     /*saveByteArray(reportName, byte) {
@@ -191,7 +194,7 @@ class SongsList extends Component {
                                     song =>
                                         <tr key = {song.songName}>
                                             <td>
-                                                <button className="btn btn-success" onClick={() => this.getSongUrl(song)}>
+                                                <button className="btn btn-success" onClick={() => this.setSongUrl(song)}>
                                                     Play
                                                 </button>
 
@@ -199,6 +202,8 @@ class SongsList extends Component {
                                             <td>{song.songName}</td>
                                             <td>{song.artist}</td>
                                             <td>{song.genre}</td>
+                                            <td>{song.url}</td>
+
                                         </tr>
                                 )
                             }
@@ -208,10 +213,13 @@ class SongsList extends Component {
                             src = {this.state.songUrl}
                             controls
                         />
+                        <Waveform songUrl = {this.state.songUrl} />
                 </div>
             </div>
         );
     }
 }
+
+
 
 export default SongsList;
