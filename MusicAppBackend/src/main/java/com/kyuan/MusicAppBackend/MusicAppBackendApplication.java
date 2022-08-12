@@ -15,7 +15,6 @@ import java.awt.print.Book;
 import java.util.List;
 
 @SpringBootApplication
-@ComponentScan(basePackages = ("com.kyuan.MusicAppBackend"))
 @Configuration
 @EnableCaching
 public class MusicAppBackendApplication {

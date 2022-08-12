@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -31,6 +34,7 @@ import java.util.Random;
 public class SongController {
     @Autowired
     private RedisTemplate<String, List<Song>> redisTemplate;
+
     @Value("${media.content.web.rootdir}")
     String webRootDir;
     @Autowired
@@ -83,6 +87,10 @@ public class SongController {
 
     @GetMapping("/songs")
     public List<Song> queryBy(@RequestParam Map<String, String> allParams) {
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        //redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         if(redisTemplate.opsForValue().get("SONG-LIST")!= null ){
             return redisTemplate.opsForValue().get("SONG-LIST");
             //String songListString = redisTemplate.opsForValue().get("SONG-LIST");
@@ -91,6 +99,7 @@ public class SongController {
 
         List<Song> songs = songService.queryBy(allParams);
         redisTemplate.opsForValue().set("SONG-LIST", songs);
+        redisTemplate.expire("SONG-LIST",6000, TimeUnit.SECONDS);
         /*try {
             redisTemplate.opsForValue().set("SONG-LIST", new ObjectMapper().writeValueAsString(songs));
         } catch (Exception e){

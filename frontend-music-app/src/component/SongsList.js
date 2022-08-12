@@ -4,8 +4,9 @@ import SongDataService from "../service/SongDataService";
 import {Link, useHref} from "react-router-dom";
 import ReactAudioPlayer from 'react-audio-player';
 import ReactPlayer from 'react-player';
-import WaveSurfer from 'wavesurfer.js';
+
 import Waveform from "./Waveform";
+import WaveformContainer from "./WaveformContainer";
 
 class SongsList extends Component {
     constructor(props) {
@@ -213,7 +214,7 @@ class SongsList extends Component {
                             src = {this.state.songUrl}
                             controls
                         />
-                        <Waveform songUrl = {this.state.songUrl} />
+                        <WaveformContainer />
                 </div>
             </div>
         );

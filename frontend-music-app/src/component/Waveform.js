@@ -1,62 +1,60 @@
-import React, { Component } from "react";
-import WaveSurfer from "wavesurfer.js";
-import { WaveformContainer, Wave, PlayButton } from "./Waveform.styled";
-//import "./Waveform.css";
+import React from "react";
+import WaveSurfer from "wavesurfer";
 
-class Waveform extends Component {
+export default class Waveform extends React.Component {
     constructor(props) {
         super(props);
+
+        this.waveformRef = React.createRef();
+        this.play = this.play.bind(this);
+        this.resetPlayhead = this.resetPlayhead.bind(this);
+
         this.state = {
-            playing: false
+            wavesurfer: null,
+            isPlaying: false
         };
     }
 
     componentDidMount() {
-        console.log("Waveform component mounted")
-        const track = document.querySelector("#track");
-
-        this.waveform = WaveSurfer.create({
-            barWidth: 3,
-            cursorWidth: 1,
-            container: "#waveform",
-            backend: "WebAudio",
-            height: 80,
-            progressColor: "#2D5BFF",
-            responsive: true,
-            waveColor: "#EFEFEF",
-            cursorColor: "transparent"
+        const wavesurfer = WaveSurfer.create({
+            container: this.waveformRef.current,
+            waveColor: "violet",
+            progressColor: "purple"
         });
-
-        this.waveform.load(track);
-        console.log(track)
+        this.setState({ wavesurfer });
+        wavesurfer.load(this.props.src);
+        console.log("this.props.src: " + this.props.src);
+        console.log("waveform component mounted")
     }
 
-    handlePlay = () => {
-        this.setState({ playing: !this.state.playing });
-        this.waveform.playPause();
-    };
+    componentWillReceiveProps(newProps, nextContext) {
+        console.log(newProps);
+        if (newProps.isPlaying !== this.props.isPlaying) {
+            this.play();
+        }
+        if (newProps.isAtBeginning === true && newProps.isAtBeginning !== this.props.isAtBeginning) {
+            this.resetPlayhead();
+        }
+    }
+
+    play() {
+        this.state.wavesurfer.playPause();
+    }
+
+    resetPlayhead() {
+        this.state.wavesurfer.seekTo(0);
+    }
 
     render() {
-        //const url = "https://api.twilio.com//2010-04-01/Accounts/AC25aa00521bfac6d667f13fec086072df/Recordings/RE6d44bc34911342ce03d6ad290b66580c.mp3";
-        //const url = "file_example_WAV_2MG.wav";
-
+        console.log(this.waveformRef);
         return (
-            /*<div className="WaveformContainer">
-                    <div className="PlayButton" onClick={this.handlePlay}>
-                        {!this.state.playing ? "Play" : "Pause"}
-                    </div>
-                    <div className="Wave"/>
-                    <audio id="track" src={url} />
-                </div>*/
-            <WaveformContainer>
-                <PlayButton onClick={this.handlePlay}>
-                    {!this.state.playing ? "Play" : "Pause"}
-                </PlayButton>
-                <Wave id="waveform" />
-                <audio id="track" src={this.props.songUrl} />
-            </WaveformContainer>
+            <div>
+                <div ref={this.waveformRef} />
+            </div>
         );
     }
 }
 
-export default Waveform;
+Waveform.defaultProps = {
+    src: ""
+};
