@@ -62,7 +62,7 @@ public class SongController {
                 genre(songEntity.getGenre()).
                 url(songEntity.getUrl()).
                 build();
-
+        redisTemplate.delete("SONG-LIST");
         return song;
     }
 
