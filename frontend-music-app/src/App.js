@@ -1,16 +1,16 @@
-import logo from './logo.svg';
 import React, { Component } from "react";
-import {Link, Route, Router, Routes} from "react-router-dom";
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import SongsList from "./component/SongsList";
 import Header from "./component/Header";
 import Loading from "./component/Loading";
 import {useAuth0} from "@auth0/auth0-react";
-import Waveform from "./component/Waveform";
-import Wavesurfer from "wavesurfer.js";
-import {WaveSurfer} from "wavesurfer-react";
-import WaveformContainer from "./component/WaveformContainer";
+import AudioRecorder from "./component/AudioRecorder";
+import LandingPage from "./component/LandingPage";
+import TopArtists from "./component/TopArtists";
+import TrackList from "./component/TrackList";
+import AudioData from "./component/AudioData";
+
 
 export default function App() {
     const { isLoading } = useAuth0();
@@ -19,28 +19,13 @@ export default function App() {
     }
     return (
         <div>
-          {/*  <nav className="navbar navbar-expand navbar-dark bg-dark">
-                <Link to={"/songs"} className="navbar-brand">
-                    kevin
-                </Link>
-                <div className="navbar-nav mr-auto">
-                    <li className="nav-item">
-                        <Link to={"/songs"} className="nav-link">
-                            Songs
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link to={"/add"} className="nav-link">
-                            Add
-                        </Link>
-                    </li>
-                </div>
-            </nav>*/}
-
             <div className="container mt-3">
-                <Header />
+                {/*<Header />*/}
+                <LandingPage />
+                <TrackList />
+                <AudioData />
                 <SongsList />
-                {/*<WaveformContainer />*/}
+                <AudioRecorder />
             </div>
         </div>
     );

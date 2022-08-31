@@ -15,7 +15,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.support.SqlLobValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +44,7 @@ public class SongController {
     @Autowired
     private SongRepository songRepo;
 
-    @PostMapping("/songs")
+    @RequestMapping(method = {RequestMethod.POST}, value = "/songs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Song uploadSong(@RequestParam("file") MultipartFile multipartFile,
                                  @RequestParam("artist") String artist,
@@ -50,12 +52,12 @@ public class SongController {
         SongEntity songEntity = new SongEntity();
         songEntity.setId(generateId());
         songEntity.setSongName(multipartFile.getOriginalFilename());
-        songEntity.setSongData(multipartFile.getBytes());
+        songEntity.setSongData(multipartFile.getInputStream().readAllBytes());
         songEntity.setSize(String.valueOf(multipartFile.getSize()));
         songEntity.setArtist(artist);
         songEntity.setGenre(genre);
-
         songEntity.setUrl(webRootDir + "audios/" + multipartFile.getOriginalFilename());
+
         songRepo.save(songEntity);
 
         Song song = Song.builder().
@@ -70,7 +72,11 @@ public class SongController {
         return song;
     }
 
+    /*@PostMapping("/songs")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Song uploadBlob(@RequestParam) {
 
+    }*/
 
     private String generateId() {
         Random rand = new Random();
