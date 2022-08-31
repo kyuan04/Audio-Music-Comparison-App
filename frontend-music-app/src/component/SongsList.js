@@ -4,9 +4,7 @@ import SongDataService from "../service/SongDataService";
 import {Link, useHref} from "react-router-dom";
 import ReactAudioPlayer from 'react-audio-player';
 import ReactPlayer from 'react-player';
-
-import Waveform from "./Waveform";
-import WaveformContainer from "./WaveformContainer";
+import Player from "react-wavy-audio";
 
 class SongsList extends Component {
     constructor(props) {
@@ -15,18 +13,18 @@ class SongsList extends Component {
         this.retrieveSongs = this.retrieveSongs.bind(this);
         this.refreshList = this.refreshList.bind(this);
         this.setActiveSong = this.setActiveSong.bind(this);
-        //this.removeSong = this.removeSong.bind(this);
         this.searchTitle = this.searchTitle.bind(this);
         this.setSongUrl = this.setSongUrl.bind(this);
-        //this.downloadSong = this.downloadSong.bind(this);
-        //this.saveByteArray = this.saveByteArray.bind(this);
+        this.downloadSong = this.downloadSong.bind(this);
+        this.saveByteArray = this.saveByteArray.bind(this);
 
         this.state = {
             songs: [],
-            songUrl: "http://localhost:8080/audios/file_example_MP3_1MG.mp3",
+            songUrl: "",
             songName: "",
             currentIndex: -1,
-            searchTitle: ""
+            searchTitle: "",
+            blobUrl: ""
         };
     }
 
@@ -114,10 +112,10 @@ class SongsList extends Component {
         //Waveform.setUrl(song.url);
     }
 
-    /*saveByteArray(reportName, byte) {
+    saveByteArray(reportName, byte) {
         console.log("saveByteArray called");
         const blob = new Blob([byte], {type: "audio/wav"});
-        console.log("blob created");
+        console.log(blob);
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
         const fileName = reportName;
@@ -125,9 +123,8 @@ class SongsList extends Component {
         link.click();
     };
 
-
-
     downloadSong(song) {
+        console.log(song.url);
         console.log("downloadSong called")
         this.setState({
             songName: song.songName,
@@ -147,10 +144,15 @@ class SongsList extends Component {
             .catch(e => {
                 console.log(e);
             });
-        console.log(this.state.songName)
-        this.saveByteArray(this.state.songName, this.state.songData);
-        console.log("song downloaded");
-    }*/
+        const blob = new Blob([this.state.songData], {type: "audio/wav"});
+        console.log(blob);
+        const url = URL.createObjectURL(blob);
+        this.setState({
+            blobUrl: url
+        });
+        console.log("blobUrl: " + this.state.blobUrl);
+        //this.saveByteArray(this.state.songName, this.state.songData);
+    }
 
     render() {
         const { songs, searchTitle, songName, currentIndex, songUrl } = this.state;
@@ -186,7 +188,8 @@ class SongsList extends Component {
                                     <th>Play Song</th>
                                     <th>Song Name</th>
                                     <th>Artist</th>
-                                    <h>Genre</h>
+                                    <th>Genre</th>
+                                    <th>URL</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -204,17 +207,31 @@ class SongsList extends Component {
                                             <td>{song.artist}</td>
                                             <td>{song.genre}</td>
                                             <td>{song.url}</td>
-
+                                            <td>
+                                                <button onClick={() => this.downloadSong(song)}>
+                                                    Download
+                                                </button>
+                                            </td>
                                         </tr>
                                 )
                             }
                             </tbody>
                         </table>
-                        <audio
-                            src = {this.state.songUrl}
-                            controls
+                        <Player
+                            audioUrl= "https://p.scdn.co/mp3-preview/7d73ccf313d752e359f5286de5555dd783c02720?cid=1634b088bf3343819af7c750fe887ee1"
+                            waveStyles={{
+                                cursorWidth: 1,
+                                progressColor: "#ee3ec9",
+                                responsive: true,
+                                waveColor: "#121640",
+                                cursorColor: "transparent",
+                                barWidth: 0
+                            }}
+                            zoom={0}
+                            //waveJson
+                            hideImage="true"
+                            //hideWave="true"
                         />
-                        <WaveformContainer />
                 </div>
             </div>
         );

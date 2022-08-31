@@ -10,7 +10,7 @@ export default function Login() {
             onClick={() => loginWithRedirect()}
             variant="primary"
         >
-            Upload Music
+
         </Button>
     );
 }

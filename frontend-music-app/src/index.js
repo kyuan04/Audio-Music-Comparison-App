@@ -11,6 +11,7 @@ const domain = "dev-hf41mlyj.us.auth0.com";
 const clientId = "z4BEvaUZCYWp7FFEOggGjzMudWAk4FcQ";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+console.log("index.js")
 root.render(
         <Auth0Provider
             domain={domain}
