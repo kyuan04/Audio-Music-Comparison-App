@@ -1,109 +1,85 @@
-import {Recorder} from 'react-voice-recorder';
-//import Recorder from 'recorder-js';
-import 'react-voice-recorder/dist/index.css';
-import Player from "react-wavy-audio";
-import axios from "axios";
-import { useReactMediaRecorder } from "react-media-recorder";
-import React, {Component, useEffect, useState} from "react";
-import SongDataService from "../service/SongDataService";
-import ReactAudioPlayer from "react-audio-player";
+import React from 'react';
+import MicRecorder from 'mic-recorder-to-mp3';
+import AudioData from "./AudioData";
 
-export default class AudioRecorder extends Component{
-    constructor(props) {
+const Mp3Recorder = new MicRecorder({ bitRate: 128 });
+
+class AudioRecorder extends React.Component {
+    constructor(props){
         super(props);
         this.state = {
-            audioURL: null,
-            blobUrl: null,
-            audioDetails: {
-                url: null,
-                blob: null,
-                chunks: null,
-                duration: {
-                    h: 0,
-                    m: 0,
-                    s: 0
-                }
-            }
+            isRecording: false,
+            blobData: null,
+            blobURL: '',
+            isBlocked: false,
         };
     }
-    handleAudioStop(data) {
-        console.log(data);
-        const blob = new Blob([data.blob], {type: "audio/wav"});
-        console.log(blob);
-        const url = URL.createObjectURL(blob);
-        this.setState({ audioDetails: data, audioUrl: data.url, blobUrl: url });
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(data.url);
 
-            reader.onload = () =>
-                resolve({
-                    fileName: data.title,
-                    base64: reader.result
-                });
-            reader.onerror = reject;
-        });
-        console.log("audioUrl: "+ this.state.audioUrl);
-        console.log(this.state.audioDetails);
+    start = () => {
+        if (this.state.isBlocked) {
+            console.log('Permission Denied');
+        } else {
+            Mp3Recorder
+                .start()
+                .then(() => {
+                    this.setState({ isRecording: true });
+                }).catch((e) => console.error(e));
+        }
+    };
 
-        //console.log(data);
+    stop = () => {
+        Mp3Recorder
+            .stop()
+            .getMp3()
+            .then(([buffer, blob]) => {
+                const url = URL.createObjectURL(blob)
+                this.setState({ blobURL: url, isRecording: false, blobData: blob }, this.showUrl);
+            }).catch((e) => console.log(e));
+    };
+
+    showUrl = () => {
+        console.log(this.state.blobData)
     }
 
-    handleAudioUpload(blob) {
-        console.log(blob);
-        SongDataService.uploadSong(blob, "me", "me");
-        console.log("posted to database");
-    }
-
-
-    handleReset() {
-        const reset = {
-            url: null,
-            blob: null,
-            chunks: null,
-            duration: {
-                h: 0,
-                m: 0,
-                s: 0
-            }
-        };
-        this.setState({ audioDetails: reset });
-    }
-    render() {
-        return (
-            <div className="AudioRecorder">
-                <Recorder
-                    hideHeader
-                    record={true}
-                    title={"New recording"}
-                    audioURL={this.state.audioDetails.url}
-                    showUIAudio
-                    handleAudioStop={(data) => this.handleAudioStop(data)}
-                    handleAudioUpload={(data) => this.handleAudioUpload(data)}
-                    saveAudio
-                    handleReset={() => this.handleReset()}
-                    uploadButtonDisabled = {false}
-                />
-                <p>Recorded Audio</p>
-                <div>
-                <Player
-                    audioUrl= "file_example_WAV_2MG.wav"
-                    waveStyles={{
-                        cursorWidth: 1,
-                        progressColor: "#ee3ec9",
-                        responsive: true,
-                        waveColor: "#121640",
-                        cursorColor: "transparent",
-                        barWidth: 0
-                    }}
-                    zoom={0}
-                    //waveJson
-                    hideImage="true"
-                    //hideWave="true"
-                />
-                </div>
-                <ReactAudioPlayer src = {this.state.blobUrl} controls/>
-            </div>
+    componentDidMount() {
+        navigator.getUserMedia({ audio: true },
+            () => {
+                console.log('Permission Granted');
+                this.setState({ isBlocked: false });
+            },
+            () => {
+                console.log('Permission Denied');
+                this.setState({ isBlocked: true })
+            },
         );
     }
+
+    render() {
+        if (this.state.blobURL === '') {
+            return (
+                <div className="App">
+                    <header className="App-header">
+                        <h5>Record Audio</h5>
+                        <button onClick={this.start} disabled={this.state.isRecording}>Record</button>
+                        <button onClick={this.stop} disabled={!this.state.isRecording}>Stop</button>
+                        <audio src={this.state.blobURL} controls="controls" />
+                    </header>
+                </div>
+            );
+        } else {
+            return (
+                <div className="App">
+                    <header className="App-header">
+                        <h5>Record Audio</h5>
+                        <button onClick={this.start} disabled={this.state.isRecording}>Record</button>
+                        <button onClick={this.stop} disabled={!this.state.isRecording}>Stop</button>
+                        <audio src={this.state.blobURL} controls="controls" />
+                        <AudioData recordedAudio={this.state.blobURL} />
+                    </header>
+                </div>
+            );
+        }
+    }
 }
+
+export default AudioRecorder;

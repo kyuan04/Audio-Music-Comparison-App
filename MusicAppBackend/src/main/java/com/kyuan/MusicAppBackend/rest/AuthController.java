@@ -1,6 +1,7 @@
 package com.kyuan.MusicAppBackend.rest;
 
 import com.neovisionaries.i18n.CountryCode;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.web.bind.annotation.*;
 
 import se.michaelthelin.spotify.SpotifyApi;
@@ -22,18 +23,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/v1")
 public class AuthController {
     private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:18080/api/v1/content");
     private String code = "";
-    private String clientId = "1634b088bf3343819af7c750fe887ee1";
-    private String clientSecret = "e26ef4d2bbc6425ab85d37f17f0fb977";
+    static Dotenv dotenv = Dotenv.load();
 
     private static final SpotifyApi spotifyApi = new SpotifyApi.Builder()
-            .setClientId(clientId)
-            .setClientSecret(clientSecret)
+            .setClientId(dotenv.get("CLIENT_ID"))
+            .setClientSecret(dotenv.get("CLIENT_SECRET"))
             .setRedirectUri(redirectUri)
             .build();
 
@@ -85,10 +86,9 @@ public class AuthController {
     }*/
 
     @GetMapping("/search")
-    public Track[] searchItem() {
-        final String type = ModelObjectType.TRACK.getType();
-        final String q = "Post Malone";
-        final SearchItemRequest searchItemRequest = spotifyApi.searchItem(q, type)
+    public Track[] searchItem(@RequestParam(value = "q", required = false) String query) {
+        final String type = ModelObjectType.TRACK.getType() + "," + ModelObjectType.ALBUM.getType() + "," + ModelObjectType.ARTIST.getType();
+        final SearchItemRequest searchItemRequest = spotifyApi.searchItem(query, type)
                 .limit(15)
                 .market(CountryCode.US)
                 .offset(5)
