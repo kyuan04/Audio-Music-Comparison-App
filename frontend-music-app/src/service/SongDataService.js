@@ -7,13 +7,25 @@ const CREATE_SONG_API_URL = `${SONG_API_URL}/api/v1/content/songs`
 const DELETE_SONG_API_URL = `${SONG_API_URL}/api/v1/content/songs`
 const UPLOAD_SONG_API_URL = `${SONG_API_URL}/api/v1/content/songs`
 const AUDIO_DATA_URL = "http://localhost:8084/api/v1/compare"
+const SEARCH_URL = "http://localhost:18080/api/v1/search"
 
 class SongDataService {
 
-    /*querySongBy() {
-        console.log(username);
-        return axios.get(`${FIND_USER_API_URL}?username=${username}&password=${password}`)
-    }*/
+    displayAudioData(data) {
+        console.log("displayAudioData called");
+        return axios.post(AUDIO_DATA_URL, data, {
+            headers: {
+                'Accept': 'application/json',
+                'Accept-Encoding': 'gzip, deflate, br'
+            }
+        })
+    }
+
+    querySong(param) {
+        console.log("searched");
+        return axios.get(`${SEARCH_URL}?q=${param}`)
+    }
+
     findByTitle(title) {
         return axios.get(`/songs?songName=${title}`);
     }
@@ -49,16 +61,6 @@ class SongDataService {
 
     deleteSong(id) {
         return axios.delete(`/songs/${id}`);
-    }
-
-    displayAudioData(data) {
-        console.log("displayAudioData called");
-        return axios.post(AUDIO_DATA_URL, data, {
-            headers: {
-                'Accept': 'application/json',
-                'Accept-Encoding': 'gzip, deflate, br'
-            }
-        })
     }
 
 }
