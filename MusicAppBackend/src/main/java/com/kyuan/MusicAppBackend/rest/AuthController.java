@@ -28,10 +28,12 @@ import java.net.URI;
 public class AuthController {
     private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:18080/api/v1/content");
     private String code = "";
+    private String clientId = "1634b088bf3343819af7c750fe887ee1";
+    private String clientSecret = "e26ef4d2bbc6425ab85d37f17f0fb977";
 
     private static final SpotifyApi spotifyApi = new SpotifyApi.Builder()
-            .setClientId("1634b088bf3343819af7c750fe887ee1")
-            .setClientSecret("e26ef4d2bbc6425ab85d37f17f0fb977")
+            .setClientId(clientId)
+            .setClientSecret(clientSecret)
             .setRedirectUri(redirectUri)
             .build();
 
