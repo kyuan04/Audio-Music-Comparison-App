@@ -1,3 +1,3 @@
 # Music-App
-This is my personal project for an app that finds songs and matches them to your listening history and preference.
-**This line is a practice commit to a branch.**
+Designed to help users practice their singing.
+Shows similarity between user-recorded audio and spotify song.
